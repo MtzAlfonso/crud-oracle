@@ -36,10 +36,13 @@ router.get("/getUsers/:codu", async (req, res) => {
   result.rows.map((user) => {
     console.log(user);
     let userSchema = {
-      codu: user[0],
-      username: user[1],
-      firstname: user[2],
-      lastname: user[3],
+      usuario_id: user[0],
+      nombre_usuario: user[1],
+      email: user[2],
+      contrasenia: user[3],
+      nombre_real: user[4],
+      ap_paterno: user[5],
+      ap_materno: user[6]
     };
     Users.push(userSchema);
   });
