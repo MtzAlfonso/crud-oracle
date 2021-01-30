@@ -4,7 +4,7 @@ const BD = require("../config/configbd");
 
 //READ
 router.get("/getUsers", async (req, res) => {
-  sql = "select * from USUARIO";
+  sql = "select * from USUARIO order by usuario_id";
 
   let result = await BD.Open(sql, [], false);
   Users = [];
@@ -18,7 +18,7 @@ router.get("/getUsers", async (req, res) => {
       contrasenia: user[3],
       nombre_real: user[4],
       ap_paterno: user[5],
-      ap_materno: user[6]
+      ap_materno: user[6],
     };
     Users.push(userSchema);
   });
@@ -26,11 +26,11 @@ router.get("/getUsers", async (req, res) => {
   res.json(Users);
 });
 
-router.get("/getUsers/:codu", async (req, res) => {
-  const { codu } = req.params;
-  sql = "select * from person where usuario_id=:codu";
+router.get("/getUsers/:usuario_id", async (req, res) => {
+  const { usuario_id } = req.params;
+  sql = "select * from USUARIO where usuario_id=:usuario_id";
 
-  let result = await BD.Open(sql, [codu], false);
+  let result = await BD.Open(sql, [usuario_id], false);
   Users = [];
 
   result.rows.map((user) => {
@@ -42,7 +42,7 @@ router.get("/getUsers/:codu", async (req, res) => {
       contrasenia: user[3],
       nombre_real: user[4],
       ap_paterno: user[5],
-      ap_materno: user[6]
+      ap_materno: user[6],
     };
     Users.push(userSchema);
   });
@@ -53,17 +53,26 @@ router.get("/getUsers/:codu", async (req, res) => {
 //CREATE
 
 router.post("/addUser", async (req, res) => {
-  const { username, firstname, lastname } = req.body;
+  const { usuario, email, password, nombre, paterno, materno } = req.body;
+
+  console.log(req);
 
   sql =
-    "insert into person(username,firstname,lastname) values (:username,:firstname,:lastname)";
+    "insert into usuario (usuario_id,nombre_usuario,email,contrasenia,nombre_real,ap_paterno,ap_materno) values (seq_usr.nextval,:nombre,:email,:password,:nombre,:paterno,:materno)";
 
-  await BD.Open(sql, [username, firstname, lastname], true);
+  await BD.Open(
+    sql,
+    [usuario, email, password, nombre, paterno, materno],
+    true
+  );
 
   res.status(200).json({
-    username: username,
-    firstname: firstname,
-    lastname: lastname,
+    nombre_usuario: usuario,
+    email: email,
+    contrasenia: password,
+    nombre_real: nombre,
+    ap_materno: paterno,
+    ap_materno: materno,
   });
 });
 
@@ -94,6 +103,5 @@ router.delete("/deleteUser/:id", async (req, res) => {
 
   res.json({ msg: "Usuario Eliminado" });
 });
-
 
 module.exports = router;

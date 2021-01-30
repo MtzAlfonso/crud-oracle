@@ -1,10 +1,10 @@
 const oracledb = require('oracledb');
 
 cns = {
-    user: "C##ALFONSO",
-    password: "123456",
-    //connectString: "192.168.0.17"
-    connectString: "localhost"
+    user: "ls_proy_admin",
+    password: "admin",
+    connectString: "192.168.0.17"
+    //connectString: "localhost"
 }
 
 
