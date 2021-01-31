@@ -9,18 +9,19 @@ router.get("/getUsers", async (req, res) => {
   let result = await BD.Open(sql, [], false);
   Users = [];
 
-  result.rows.map((user) => {
-    console.log(user);
+  result.rows.map((usario) => {
+    console.log(usario);
     let userSchema = {
-      usuario_id: user[0],
-      nombre_usuario: user[1],
-      email: user[2],
-      contrasenia: user[3],
-      nombre_real: user[4],
-      ap_paterno: user[5],
-      ap_materno: user[6],
+      usuario_id: usario[0],
+      nombre_usuario: usario[1],
+      email: usario[2],
+      contrasenia: usario[3],
+      nombre_real: usario[4],
+      ap_paterno: usario[5],
+      ap_materno: usario[6],
     };
     Users.push(userSchema);
+    //console.log(Users);
   });
 
   res.json(Users);
