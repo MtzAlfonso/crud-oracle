@@ -21,7 +21,6 @@ router.get("/getUsers", async (req, res) => {
       ap_materno: usario[6],
     };
     Users.push(userSchema);
-    //console.log(Users);
   });
 
   res.json(Users);
@@ -56,10 +55,9 @@ router.get("/getUsers/:usuario_id", async (req, res) => {
 router.post("/addUser", async (req, res) => {
   const { usuario, email, password, nombre, paterno, materno } = req.body;
 
-  console.log(req);
-
+  //
   sql =
-    "insert into usuario (usuario_id,nombre_usuario,email,contrasenia,nombre_real,ap_paterno,ap_materno) values (seq_usr.nextval,:nombre,:email,:password,:nombre,:paterno,:materno)";
+    "insert into usuario (usuario_id,nombre_usuario,email,contrasenia,nombre_real,ap_paterno,ap_materno) values (seq_usr.nextval,:usuario,:email,:password,:nombre,:paterno,:materno)";
 
   await BD.Open(
     sql,
@@ -79,18 +77,33 @@ router.post("/addUser", async (req, res) => {
 
 //UPDATE
 router.put("/updateUser", async (req, res) => {
-  const { codu, username, firstname, lastname } = req.body;
+  const {
+    usuario_id,
+    usuario,
+    email,
+    password,
+    nombre,
+    paterno,
+    materno,
+  } = req.body;
 
   sql =
-    "update usuario set username=:username, firstname=:firstname, lastname=:lastname where codu=:codu";
+    "update usuario set nombre_usuario=:usuario, email=:email, contrasenia=:password, nombre_real=:nombre, ap_paterno=:paterno, ap_materno=:materno where usuario_id=:usuario_id";
 
-  await BD.Open(sql, [username, firstname, lastname, codu], true);
+  await BD.Open(
+    sql,
+    [usuario, email, password, nombre, paterno, materno, usuario_id],
+    true
+  );
 
   res.status(200).json({
-    codu: codu,
-    username: username,
-    firstname: firstname,
-    lastname: lastname,
+    nombre_usuario: usuario,
+    email: email,
+    contrasenia: password,
+    nombre_real: nombre,
+    ap_paterno: paterno,
+    ap_materno: materno,
+    msg: "Usuario actualizado correctamente"
   });
 });
 
@@ -98,11 +111,18 @@ router.put("/updateUser", async (req, res) => {
 router.delete("/deleteUser/:id", async (req, res) => {
   const { id } = req.params;
 
-  sql = "delete from usuario where usuario_id=:id";
+  // Try-cach para verficar que la sentencia se realizó, debido a llaves foraneas
+  try {
+    sql = "delete from usuario where usuario_id=:id";
 
-  await BD.Open(sql, [id], true);
+    await BD.Open(sql, [id], true);
 
-  res.json({ msg: "Usuario Eliminado" });
+    res.status(200).json({ msg: "Usuario Eliminado" });
+  } catch (error) {
+    res.status(500).json({
+      msg: "El usuario no se puede eliminar",
+    });
+  }
 });
 
 module.exports = router;

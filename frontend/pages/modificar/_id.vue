@@ -3,7 +3,10 @@
     <b-container>
       <b-row align-h="center">
         <b-col cols="12" class="text-center">
-          <h1>Formulario de Registro</h1>
+          <h1>Actualizar datos</h1>
+          <pre>
+              {{ usuario }}
+          </pre>
         </b-col>
         <b-col cols="6">
           <b-form @submit="onSubmit" @reset="onReset">
@@ -18,7 +21,7 @@
                 id="input-usuario"
                 v-model="form.usuario"
                 type="text"
-                placeholder="Nombre de usuario"
+                placeholder="Ingresa tu usuario"
                 required
               ></b-form-input>
             </b-form-group>
@@ -100,7 +103,7 @@
               ></b-form-input>
             </b-form-group>
 
-            <b-button type="submit" variant="success">Guardar</b-button>
+            <b-button type="submit" variant="warning">Actualizar</b-button>
             <b-button type="reset" variant="danger">Limpiar</b-button>
           </b-form>
           <b-card class="mt-3" header="Form Data Result">
@@ -114,6 +117,15 @@
 
 <script>
 export default {
+  async asyncData({ $axios, params }) {
+    let usuario = await $axios.$get(
+      "http://localhost:3001/getUsers/" + params.id
+    );
+
+    return {
+      usuario,
+    };
+  },
   data() {
     return {
       form: {
@@ -123,19 +135,37 @@ export default {
         nombre: "",
         paterno: "",
         materno: "",
+        usuario_id: "",
       },
     };
+  },
+  mounted() {
+    this.form.usuario = this.usuario[0].nombre_usuario;
+    this.form.password = this.usuario[0].contrasenia;
+    this.form.email = this.usuario[0].email;
+    this.form.nombre = this.usuario[0].nombre_real;
+    this.form.paterno = this.usuario[0].ap_paterno;
+    this.form.materno = this.usuario[0].ap_materno;
+    this.form.usuario_id = this.usuario[0].usuario_id;
   },
   methods: {
     onSubmit(event) {
       event.preventDefault();
-      this.$axios.setHeader("Content-Type", "application/json", ["post"]);
-      this.$axios.$post("http://localhost:3001/addUser", this.form);
+      this.$axios.setHeader("Content-Type", "application/json", ["put"]);
+      this.$axios
+        .$put("http://localhost:3001/updateUser", this.form)
+        .then((res) => {
+          this.$bvToast.toast(res.msg, {
+            title: "Actualizado",
+            autoHideDelay: 5000,
+            appendToast: true,
+            variant: "success",
+          });
+        });
     },
     onReset(event) {
       event.preventDefault();
-      // Reinicia los valores del formulario
-      this.form.usuario = "";
+      // Reset our form values
       this.form.email = "";
       this.form.name = "";
     },
